@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "577731956396",
+    "project_id": "chatsma-fl",
+    "storage_bucket": "chatsma-fl.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:577731956396:android:29419cfd1031e8143d1909",
+        "android_client_info": {
+          "package_name": "vn.nvt.chatsma_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "577731956396-ilkodhsvhhhm56fi9cvi4s9q3mc4b5uv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "vn.nvt.chatsma_flutter",
+            "certificate_hash": "edae3e153df716ff4225c1e089e06fad5386ed11"
+          }
+        },
+        {
+          "client_id": "577731956396-7mv6tqmi1e0flf8mkrcvaoqmmvgsk4g8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBc3Ci0_J8NXm8ARsAWF2KpIcYPYElvcgk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "577731956396-7mv6tqmi1e0flf8mkrcvaoqmmvgsk4g8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "577731956396-nqboefhrstfemgvtpehoda2oe5qkpkd8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "vn.nvt.chatsmaFlutter"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
