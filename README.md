@@ -5,8 +5,8 @@
 A new Flutter project.
 
 ## Information
-A product developed by Nguyen Van Thanh
-Mail: ThanhFW28@gmail.com
+- A product developed by Nguyen Van Thanh
+- Mail: ThanhFW28@gmail.com
 
 ## Getting Started
 Set firebase and run
@@ -26,15 +26,10 @@ Set firebase and run
 ## Setup
 - Flutter sdk 3.7.8
 - get Firebase
-- 
 
 ## Best wish
 Happy a nice day 👍
 
-## Note
-I do not own any of the images used in this project.
-
-For help getting started with Flutter, view our online documentation, which offers tutorials, samples, guidance on mobile development, and a full API reference.
 
 ## Demo
 ![alt text](./assets/demo/landing_screen.png)
