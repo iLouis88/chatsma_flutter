@@ -6,13 +6,14 @@ class ChatContact {
   final DateTime timeSent;
   final String lastMessage;
 
-  ChatContact({
-      required this.name,
+
+
+  ChatContact(
+      {required this.name,
       required this.profilePicture,
       required this.contactId,
       required this.timeSent,
       required this.lastMessage});
-  
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -27,10 +28,11 @@ class ChatContact {
   factory ChatContact.fromMap(Map<String, dynamic> map) {
     return ChatContact(
       name: map['name'] ?? '',
-      profilePicture: map['profilePicture']?? '',
-      contactId: map['contactId']?? '',
+      profilePicture: map['profilePicture'] ?? '',
+      contactId: map['contactId'] ?? '',
       timeSent: DateTime.fromMillisecondsSinceEpoch(map['timeSent'] ?? ''),
       lastMessage: map['lastMessage'] ?? '',
     );
   }
+
 }

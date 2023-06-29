@@ -1,13 +1,19 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:chatsma_flutter/common/providers/message_reply_provider.dart';
 import 'package:chatsma_flutter/common/repositories/common_firebase_storage_repository.dart';
 import 'package:chatsma_flutter/common/utils/utils.dart';
+import 'package:chatsma_flutter/config/notification_config.dart';
 import 'package:chatsma_flutter/models/group.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 import '../../../common/enums/message_enum.dart';
 import '../../../models/chat_contact.dart';
@@ -22,7 +28,118 @@ final chatRepositoryProvider = Provider(
 class ChatRepository {
   final FirebaseFirestore firestore;
   final FirebaseAuth auth;
-  ChatRepository({required this.firestore, required this.auth});
+  ChatRepository({
+    required this.firestore,
+    required this.auth,
+  });
+
+  final FirebaseMessaging messaging = FirebaseMessaging.instance;
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+
+  Future<void> getFMToken({required UserModel existingUser}) async {
+    try {
+      await messaging.requestPermission();
+      String? token = await messaging.getToken();
+      if (token != null) {
+        // Lưu trữ token vào Firestore
+        FirebaseFirestore firestore = FirebaseFirestore.instance;
+        Map<String, dynamic> tokenData = {
+          'token': token,
+          'userId': existingUser.uid,
+        };
+        await firestore.collection('tokens').add(tokenData);
+
+        // Cập nhật thuộc tính notificationToken của đối tượng UserModel
+        UserModel updatedUser = UserModel(
+          name: existingUser.name,
+          uid: existingUser.uid,
+          profilePicture: existingUser.profilePicture,
+          isOnline: existingUser.isOnline,
+          phoneNumber: existingUser.phoneNumber,
+          email: existingUser.email,
+          groupId: existingUser.groupId,
+          notificationToken: token,
+        );
+
+        // Cập nhật đối tượng UserModel trong Firestore
+        Map<String, dynamic> userMap = updatedUser.toMap();
+        await firestore
+            .collection('users')
+            .doc(existingUser.uid)
+            .update(userMap);
+
+        // Cập nhật notificationToken của User thông qua hàm setNotificationToken
+        User user = auth.currentUser!;
+        UserModel userModel = UserModel.fromFirebaseUser(user);
+        getNotificationToken(userModel, token);
+
+        log('Notification token: $token');
+
+      } else {
+        log('Failed to get FCM token.');
+      }
+    } catch (e) {
+      log('Error getting FCM token: $e');
+    }
+
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      log('Got a message whilst in the foreground!');
+      log('Message data: ${message.data}');
+
+      if (message.notification != null) {
+        log('Message also contained a notification: ${message.notification}');
+      }
+    });
+  }
+
+  void getNotificationToken(UserModel? user, String token) {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    firestore.collection('users').doc(user!.uid).update({
+      'notificationToken': token,
+    });
+  }
+
+
+Future<void> pushNotification({
+    required UserModel existingUser,
+    required UserModel receiverUser,
+    required String text,
+  }) async {
+    try {
+      final body = {
+        "to": receiverUser.notificationToken,
+        "notification": {
+          "title": '${existingUser.name}',
+          "body": text,
+          "android_channel_id": "chats"
+        },
+      };
+
+      var res = await http.post(
+        Uri.parse('https://fcm.googleapis.com/fcm/send'),
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'key=${NotifyConfig.serverKeyNotify}'
+        },
+        body: jsonEncode(body),
+      );
+      log('Response status: ${res.statusCode}');
+      log('Response body: ${res.body}');
+
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Stream<UserModel> getUserInfo() {
+    return firestore
+        .collection('users')
+        .doc(auth.currentUser!.uid)
+        .snapshots()
+        .map((snapshot) => UserModel.fromMap(snapshot.data()!));
+  }
 
   //Show chat contacts
   Stream<List<ChatContact>> getChatContacts() {
@@ -69,8 +186,20 @@ class ChatRepository {
     });
   }
 
+  //
+  Stream<List<Group>> getAllChatGroups() {
+    return firestore.collection('groups').snapshots().map((event) {
+      List<Group> groups = [];
+      for (var document in event.docs) {
+        var group = Group.fromMap(document.data());
+        groups.add(group);
+      }
+      return groups;
+    });
+  }
+
   //Show messages (personal)
-  Stream<List<Message>> getChatStream(String receiverUserId) {
+  Stream<List<MessageModel>> getChatStream(String receiverUserId) {
     return firestore
         .collection('users')
         .doc(auth.currentUser!.uid)
@@ -80,26 +209,26 @@ class ChatRepository {
         .orderBy('timeSent')
         .snapshots()
         .map((event) {
-      List<Message> messages = [];
+      List<MessageModel> messages = [];
       for (var document in event.docs) {
-        messages.add(Message.fromMap(document.data()));
+        messages.add(MessageModel.fromMap(document.data()));
       }
       return messages;
     });
   }
 
   // Show group messages
-  Stream<List<Message>> getGroupChatStream(String groudId) {
+  Stream<List<MessageModel>> getGroupChatStream(String groupId) {
     return firestore
         .collection('groups')
-        .doc(groudId)
+        .doc(groupId)
         .collection('chats')
         .orderBy('timeSent')
         .snapshots()
         .map((event) {
-      List<Message> messages = [];
+      List<MessageModel> messages = [];
       for (var document in event.docs) {
-        messages.add(Message.fromMap(document.data()));
+        messages.add(MessageModel.fromMap(document.data()));
       }
       return messages;
     });
@@ -167,7 +296,7 @@ class ChatRepository {
     required String? receiverUserName,
     required bool isGroupChat,
   }) async {
-    final message = Message(
+    final message = MessageModel(
       senderId: auth.currentUser!.uid,
       receiverId: receiverUserId,
       text: text,
@@ -261,6 +390,24 @@ class ChatRepository {
         senderUsername: senderUser.name,
         isGroupChat: isGroupChat,
       );
+
+
+      final timesent = DateTime.now();
+      final ref = firestore.collection('users')
+          .doc(auth.currentUser!.uid)
+          .collection('chats')
+          .doc(receiverUserId)
+          .collection('messages');
+
+      await ref.doc(timesent.toString()).set({
+        'messageId': messageId,
+        'text': text,
+        'senderUser': senderUser.toMap(),
+        'receiverUser': receiverUserData!.toMap(),
+      }).then((value) => pushNotification(
+          existingUser: senderUser,
+          receiverUser: receiverUserData!,
+          text: text));
     } catch (e) {
       showSnackBar(context: context, content: e.toString());
     }
@@ -286,11 +433,11 @@ class ChatRepository {
             'chat/${messageEnum.type}/${senderUserData.uid}/$receiverUserId/$messageId',
             file,
           );
-    // receiverUserData = UserModel.fromMap(userDataMap.data()!);
+      // receiverUserData = UserModel.fromMap(userDataMap.data()!);
       UserModel? receiverUserData;
       if (!isGroupChat) {
         var userDataMap =
-        await firestore.collection('users').doc(receiverUserId).get();
+            await firestore.collection('users').doc(receiverUserId).get();
         if (userDataMap.data() != null) {
           receiverUserData = UserModel.fromMap(userDataMap.data()!);
         }
@@ -300,7 +447,7 @@ class ChatRepository {
       // // receiverUserData = UserModel.fromMap(userDataMap.data()!);
 
       // su dung dc
-     /* var userDataMap =
+      /* var userDataMap =
           await firestore.collection('users').doc(receiverUserId).get();
       if (userDataMap.data() != null) {
         receiverUserData = UserModel.fromMap(userDataMap.data()!);
@@ -335,7 +482,6 @@ class ChatRepository {
         timeSent,
         receiverUserId,
         isGroupChat,
-
       );
 
       _saveMessageToMessageSubcollection(
@@ -370,7 +516,7 @@ class ChatRepository {
 
       if (!isGroupChat) {
         var userDataMap =
-        await firestore.collection('users').doc(receiverUserId).get();
+            await firestore.collection('users').doc(receiverUserId).get();
         receiverUserData = UserModel.fromMap(userDataMap.data()!);
       }
 
@@ -415,9 +561,7 @@ class ChatRepository {
           .doc(receiverUserId)
           .collection('messages')
           .doc(messageId)
-          .update({
-        'isSeen': true,
-      });
+          .update({'isSeen': true});
 
       await firestore
           .collection('users')
@@ -426,11 +570,127 @@ class ChatRepository {
           .doc(auth.currentUser!.uid)
           .collection('messages')
           .doc(messageId)
-          .update({
-        'isSeen': true,
-      });
+          .update({'isSeen': true});
     } catch (e) {
       showSnackBar(context: context, content: e.toString());
     }
   }
-}
+
+  //************* Function (delete) *************//
+
+  // Hide chat contact, - contact list
+  void hideChatContact(String receiverUserId) async {
+    final contactId = auth.currentUser!.uid;
+    await firestore
+        .collection('users')
+        .doc(contactId)
+        .collection('chats')
+        .doc(receiverUserId)
+        .delete();
+  }
+
+//delete chat contact & all sender messages - contact list
+  Future<void> deleteChatContactMess(String receiverUserId) async {
+    final contactId = auth.currentUser!.uid;
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(contactId)
+        .collection('chats')
+        .doc(receiverUserId)
+        .collection('messages')
+        .get()
+        .then((snapshot) {
+      for (DocumentSnapshot doc in snapshot.docs) {
+        doc.reference.delete();
+      }
+    });
+
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(contactId)
+        .collection('chats')
+        .doc(receiverUserId)
+        .collection('messages')
+        .get();
+
+    if (querySnapshot.docs.isEmpty) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(contactId)
+          .collection('chats')
+          .doc(receiverUserId)
+          .delete();
+    }
+  }
+
+  //delete all sender messages - contact list
+  Future<void> deleteAllPrivateChats(String receiverUserId) {
+    return firestore
+        .collection('users')
+        .doc(auth.currentUser!.uid)
+        .collection('chats')
+        .doc(receiverUserId)
+        .collection('messages')
+        .get()
+        .then((snapshot) {
+      for (DocumentSnapshot doc in snapshot.docs) {
+        doc.reference.delete();
+      }
+    });
+  }
+
+  // Only delete your messages - list chat
+  void deleteSenderMessages(String receiverUserId, String messageId) async {
+    await firestore
+        .collection('users')
+        .doc(auth.currentUser!.uid)
+        .collection('chats')
+        .doc(receiverUserId)
+        .collection('messages')
+        .doc(messageId)
+        .delete();
+  }
+
+  //************ Group ********//
+
+  //Delete both group and message
+  Future<void> deleteGroupChats(String groupId) async {
+    await firestore
+        .collection('groups')
+        .doc(groupId)
+        .collection('chats')
+        .get()
+        .then((snapshot) {
+      for (DocumentSnapshot doc in snapshot.docs) {
+        doc.reference.delete();
+      }
+    });
+
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('groups')
+        .doc(groupId)
+        .collection('chats')
+        .get();
+
+    if (querySnapshot.docs.isEmpty) {
+      await FirebaseFirestore.instance
+          .collection('groups')
+          .doc(groupId)
+          .delete();
+    }
+  }
+
+  // Delete Group Chat for all messages in a group
+  Future<void> deleteGroupChat(String groupId) {
+    return firestore
+        .collection('groups')
+        .doc(groupId)
+        .collection('chats')
+        .get()
+        .then((snapshot) {
+      for (DocumentSnapshot doc in snapshot.docs) {
+        doc.reference.delete();
+      }
+    });
+  }
+} // class ChatRepository

@@ -1,6 +1,6 @@
 import '../common/enums/message_enum.dart';
 
-class Message {
+class MessageModel {
   final String senderId;
   final String receiverId;
   final String text;
@@ -12,7 +12,7 @@ class Message {
   final String repliedTo;
   final MessageEnum repliedMessageType;
 
-  Message({
+  MessageModel({
     required this.senderId,
     required this.receiverId,
     required this.text,
@@ -40,8 +40,8 @@ class Message {
     };
   }
 
-  factory Message.fromMap(Map<String, dynamic> map) {
-    return Message(
+  factory MessageModel.fromMap(Map<String, dynamic> map) {
+    return MessageModel(
       senderId: map['senderId'] as String,
       receiverId: map['receiverId'] as String,
       text: map['text'] as String,

@@ -113,27 +113,7 @@ class OTPScreen extends ConsumerWidget {
                             ))),
                   ],
                 ),
-                // SizedBox(
-                //   width: size.width * 0.5,
-                //   child: TextField(
-                //     textAlign: TextAlign.center,
-                //     decoration: const InputDecoration(
-                //       hintText: '- - - - - -',
-                //       hintStyle: TextStyle(
-                //         fontSize: 50,
-                //       ),
-                //     ),
-                //     keyboardType: TextInputType.number,
-                //     onChanged: (val) {
-                //       if (val != null && val.trim().length == 6) {
-                //         debugPrint('Verify OTP');
-                //         verifyOTP(ref, context, val.trim());
-                //       }
-                //       debugPrint('This function was run');
-                //
-                //     },
-                //   ),
-                // ),
+
               ],
             ),
           ),

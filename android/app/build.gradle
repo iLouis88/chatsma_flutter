@@ -31,6 +31,9 @@ android {
     ndkVersion flutter.ndkVersion
 
     compileOptions {
+        // Flag to enable support for the new language APIs
+        coreLibraryDesugaringEnabled true
+
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -68,6 +71,11 @@ android {
 flutter {
     source '../..'
 }
+/*
+ext {
+    flutterLocalNotificationsVersion = "6.0.0"
+}
+*/
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -75,4 +83,11 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:31.2.3')
     // When using the BoM, don't specify versions in Firebase dependencies
     implementation 'com.google.firebase:firebase-analytics'
+
+ //   implementation "com.dexterous:androidlibraries:$flutterLocalNotificationsVersion"
+
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+
+    implementation 'androidx.window:window:1.0.0'
+    implementation 'androidx.window:window-java:1.0.0'
 }

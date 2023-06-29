@@ -31,6 +31,10 @@ class AuthController {
     return user;
   }
 
+  void signInWithGoogle (BuildContext context)async {
+    await authRepository.signInWithGoogle(context);
+  }
+
   void signInWithPhone(BuildContext context, String phoneNumber) {
     authRepository.signInWithPhone(context, phoneNumber);
   }
@@ -52,10 +56,16 @@ class AuthController {
    Stream<UserModel>userDataById(String userId) {
     return authRepository.userData(userId);
    }
-
+  Stream<UserModel>otherUserDataById(String uid) {
+    return authRepository.otherUserData(uid);
+  }
   // Changing Online/Offline Status (3) n1
   void setUserState (bool isOnline) async {
     authRepository.setUserState(isOnline);
+  }
+
+  Future<void> logout(BuildContext context)  {
+    return authRepository.logout(context);
   }
 
 }

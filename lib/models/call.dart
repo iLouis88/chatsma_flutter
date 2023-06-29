@@ -18,8 +18,10 @@ class Call {
     required this.hasDialled,
   });
 
+
+
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       'callerId': callerId,
       'callerName': callerName,
       'callerPicture': callerPicture,
@@ -33,14 +35,15 @@ class Call {
 
   factory Call.fromMap(Map<String, dynamic> map) {
     return Call(
-      callerId: map['callerId'] ?? '',
-      callerName: map['callerName'] ?? '',
-      callerPicture: map['callerPicture'] ?? '',
-      receiverId: map['receiverId'] ?? '',
-      receiverName: map['receiverName'] ?? '',
-      receiverPicture: map['receiverPicture'] ?? '',
-      callId: map['callId'] ?? '',
-      hasDialled: map['hasDialled'] ?? false,
+      callerId: map['callerId'] as String,
+      callerName: map['callerName'] as String,
+      callerPicture: map['callerPicture'] as String,
+      receiverId: map['receiverId'] as String,
+      receiverName: map['receiverName'] as String,
+      receiverPicture: map['receiverPicture'] as String,
+      callId: map['callId'] as String,
+      hasDialled: map['hasDialled'] as bool,
     );
   }
+
 }

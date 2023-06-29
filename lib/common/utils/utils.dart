@@ -2,7 +2,6 @@
       import 'package:enough_giphy_flutter/enough_giphy_flutter.dart';
       import 'package:flutter/material.dart';
       import 'package:image_picker/image_picker.dart';
-      import 'package:flutter/foundation.dart' show kIsWeb;
 
     void showSnackBar({
       required BuildContext context,

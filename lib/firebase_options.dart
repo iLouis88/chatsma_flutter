@@ -17,7 +17,10 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -25,7 +28,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -43,16 +49,6 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDDhZr9JYVJlxVTBQue0N0iGDLrsl4RnTg',
-    appId: '1:577731956396:web:68fad93456877f583d1909',
-    messagingSenderId: '577731956396',
-    projectId: 'chatsma-fl',
-    authDomain: 'chatsma-fl.firebaseapp.com',
-    storageBucket: 'chatsma-fl.appspot.com',
-    measurementId: 'G-3FTHSJP76Q',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBc3Ci0_J8NXm8ARsAWF2KpIcYPYElvcgk',
     appId: '1:577731956396:android:29419cfd1031e8143d1909',
@@ -62,17 +58,6 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyD9fFFS6kWH2ykP3xbGTPGS0lK136dZ9Cg',
-    appId: '1:577731956396:ios:dd1b167895936dea3d1909',
-    messagingSenderId: '577731956396',
-    projectId: 'chatsma-fl',
-    storageBucket: 'chatsma-fl.appspot.com',
-    androidClientId: '577731956396-ilkodhsvhhhm56fi9cvi4s9q3mc4b5uv.apps.googleusercontent.com',
-    iosClientId: '577731956396-nqboefhrstfemgvtpehoda2oe5qkpkd8.apps.googleusercontent.com',
-    iosBundleId: 'vn.nvt.chatsmaFlutter',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyD9fFFS6kWH2ykP3xbGTPGS0lK136dZ9Cg',
     appId: '1:577731956396:ios:dd1b167895936dea3d1909',
     messagingSenderId: '577731956396',

@@ -45,7 +45,7 @@ class _UserInformationScreenState extends ConsumerState<UserInformationScreen> {
     final size = MediaQuery.of(context).size;
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Profile'),
+          title: const Text('Enter Information'),
           elevation: 0,
           leading: IconButton(
               onPressed: () {

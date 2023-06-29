@@ -1,16 +1,41 @@
 # chatsma_flutter
+## Chat SMA
+
 
 A new Flutter project.
 
+## Information
+A product developed by Nguyen Van Thanh
+Mail: ThanhFW28@gmail.com
+
 ## Getting Started
+Set firebase and run
 
-This project is a starting point for a Flutter application.
+## Features
+- Phone Number Authentication & Signin with google
+- 1-1 Chatting with Contacts Only
+- Group Chatting
+- Text, Image, GIF, Audio(Recording), Video & Emoji Sharing
+- Status Visible to Contacts Only and Disappears after 24 hours
+- Video Calling
+- Online/Offline Status
+- Seen Message
+- Replying to Messages
+- Auto Scroll on New Messages
 
-A few resources to get you started if this is your first Flutter project:
+## Setup
+- Flutter sdk 3.7.8
+- get Firebase
+- 
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Best wish
+Happy a nice day 👍
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Note
+I do not own any of the images used in this project.
+
+For help getting started with Flutter, view our online documentation, which offers tutorials, samples, guidance on mobile development, and a full API reference.
+
+## Demo
+![alt text](./assets/demo/landing_screen.png)
+![alt text](./assets/demo/chat_screen.png)

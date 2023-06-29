@@ -38,6 +38,12 @@ class NotificationService {
       showNotification(
           message.notification!.title!, message.notification!.body!);
     });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      showCallNotification(
+          message.notification!.title!, message.notification!.body!);
+    });
+
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 

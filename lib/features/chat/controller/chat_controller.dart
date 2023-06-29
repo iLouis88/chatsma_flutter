@@ -1,5 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-
 import 'dart:io';
 
 import 'package:chatsma_flutter/common/enums/message_enum.dart';
@@ -8,6 +6,7 @@ import 'package:chatsma_flutter/features/auth/controller/auth_controller.dart';
 import 'package:chatsma_flutter/features/chat/repositories/chat_repository.dart';
 import 'package:chatsma_flutter/models/chat_contact.dart';
 import 'package:chatsma_flutter/models/group.dart';
+import 'package:chatsma_flutter/models/user_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -31,18 +30,26 @@ class ChatController {
     return chatRepository.getChatContacts();
   }
 
+  Stream<UserModel> getUserInfo() {
+    return chatRepository.getUserInfo();
+  }
+
   // show group list
   Stream<List<Group>> chatGroups() {
     return chatRepository.getChatGroups();
   }
 
+  Stream<List<Group>> showAllGroups() {
+    return chatRepository.getAllChatGroups();
+  }
+
   //show messages
-  Stream<List<Message>> chatStream(String receiverUserId) {
+  Stream<List<MessageModel>> chatStream(String receiverUserId) {
     return chatRepository.getChatStream(receiverUserId);
   }
 
   // show group messages
-  Stream<List<Message>> groupChatStream(String groupId) {
+  Stream<List<MessageModel>> groupChatStream(String groupId) {
     return chatRepository.getGroupChatStream(groupId);
   }
 
@@ -63,6 +70,7 @@ class ChatController {
             isGroupChat: isGroupChat,
           ),
         );
+
     ref.read(messageReplyProvider.notifier).update((notifier) => null);
   }
 
@@ -123,5 +131,54 @@ class ChatController {
       receiverUserId,
       messageId,
     );
+  }
+
+  // ````````````````````` Push Notification `````````````````````//
+  Future<void> getFMToken({required UserModel existingUser}) async {
+    await chatRepository.getFMToken(existingUser: existingUser);
+  }
+
+  void getNotificationToken(UserModel? user, String token) {
+    return chatRepository.getNotificationToken(user, token);
+  }
+
+  Future<void> pushNotification(
+      UserModel existingUser, UserModel receiverUser, String text) {
+    return chatRepository.pushNotification(
+      existingUser: existingUser,
+      receiverUser: receiverUser,
+      text: text,
+    );
+  }
+
+  //********** Function (Delete) **********/
+
+  // hide a chat contact
+  void hideChatContact(String receiverUserId) {
+    return chatRepository.hideChatContact(receiverUserId);
+  }
+
+  Future<void> deleteChatContactMess(String receiverUserId) {
+    return chatRepository.deleteChatContactMess(receiverUserId);
+  }
+
+  // Delete all content of an individual chat
+  Future<void> deleteAllPrivateChats(String receiverUserId) {
+    return chatRepository.deleteAllPrivateChats(receiverUserId);
+  }
+
+// Delete only the sender's messages
+  void deleteSenderMessages(String receiverUserId, String messageId) {
+    return chatRepository.deleteSenderMessages(receiverUserId, messageId);
+  }
+
+// delete group messages
+  Future<void> deleteGroupChats(String groupId) async {
+    return chatRepository.deleteGroupChats(groupId);
+  }
+
+//Delete group
+  Future<void> deleteGroupChat(String groupId) {
+    return chatRepository.deleteGroupChat(groupId);
   }
 }

@@ -41,20 +41,73 @@ class MyMessageCard extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-               Icon(
-               isSeen ? Icons.remove_red_eye : Icons.done,
-                size: 17,
-                color: isSeen ? Colors.blue : Colors.grey,
-              ),
-              const SizedBox(
-                width: 5,
-              ),
-              Text(
-                date,
-                style: const TextStyle(
-                  fontSize: 10,
-                  color: Colors.grey,
-                ),
+              Column(
+                children: [
+                  // Icon(
+                  //   isSeen ? Icons.remove_red_eye : Icons.done_all,
+                  //   size: 17,
+                  //   color: isSeen ? Colors.blue : Colors.grey,
+                  // ),
+                  // Text( isSeen ? 'Seen' : 'Sent',
+                  //   style: TextStyle(fontSize: 17,
+                  //     color: isSeen ? Colors.blue : Colors.grey,),
+                  // ),
+
+                  isSeen
+                      ? RichText(
+                          text: const TextSpan(children: [
+                            TextSpan(
+                              text: 'Seen',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.green,
+                              ),
+                            ),
+                            WidgetSpan(
+                              child: SizedBox(
+                                width: 5,
+                              ),
+                            ),
+                            WidgetSpan(
+                              child: Icon(
+                                Icons.done_all,
+                                size: 15,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ]),
+                        )
+                      : RichText(
+                          text: const TextSpan(children: [
+                            TextSpan(
+                              text: 'Sent',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            WidgetSpan(
+                              child: SizedBox(
+                                width: 5,
+                              ),
+                            ),
+                            WidgetSpan(
+                              child: Icon(Icons.check_circle_outline,
+                                  size: 15, color: Colors.grey),
+                            ),
+                          ]),
+                        ),
+                  Text(
+                    date,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                ],
               ),
               Flexible(
                 child: SingleChildScrollView(
@@ -68,64 +121,54 @@ class MyMessageCard extends StatelessWidget {
                     child: Stack(
                       children: [
                         Padding(
-                            padding: type == MessageEnum.text
-                                ? const EdgeInsets.only(
-                                    left: 10,
-                                    right: 10,
-                                    top: 10,
-                                    bottom: 10,
-                                    // left: 10,
-                                    // right: 30,
-                                    // top: 5,
-                                    // bottom: 20,
-                                  )
-                                : const EdgeInsets.only(
-                                    left: 5,
-                                    right: 5,
-                                    top: 5,
-                                    bottom: 5,
-                                  ),
-                            child: Column(
-                              children: [
-                                if (isReplying) ...[
-                                  Text(
-                                    username,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 3),
-                                        Container(
-                                          padding: const EdgeInsets.all(6.0),
-                                          constraints: const BoxConstraints(
-                                            minWidth: 150,
-                                            minHeight: 50,
-                                            maxHeight: 50,
-
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: backgroundColor.withOpacity(0.5),
-                                            borderRadius: const BorderRadius.all(
-                                                Radius.circular(
-                                              5,
-                                            )),
-
-                                          ),
-
-                                          child: DisplayTextImageGIF(
-                                              message: repliedText,
-                                              type: repliedMessageType),
-
-                                        ),
-
-                                  const SizedBox(height: 8),
-                                ],
-                                DisplayTextImageGIF(
-                                  message: message,
-                                  type: type,
+                          padding: type == MessageEnum.text
+                              ? const EdgeInsets.only(
+                                  left: 10,
+                                  right: 10,
+                                  top: 10,
+                                  bottom: 10,
+                                )
+                              : const EdgeInsets.only(
+                                  left: 5,
+                                  right: 5,
+                                  top: 5,
+                                  bottom: 5,
                                 ),
+                          child: Column(
+                            children: [
+                              if (isReplying) ...[
+                                Text(
+                                  username,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 3),
+                                Container(
+                                  padding: const EdgeInsets.all(6.0),
+                                  constraints: const BoxConstraints(
+                                    minWidth: 150,
+                                    minHeight: 50,
+                                    maxHeight: 50,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: backgroundColor.withOpacity(0.5),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(5)),
+                                  ),
+                                  child: DisplayTextImageGIF(
+                                      message: repliedText,
+                                      type: repliedMessageType),
+                                ),
+                                const SizedBox(height: 8),
                               ],
-                            )),
+                              DisplayTextImageGIF(
+                                message: message,
+                                type: type,
+                              ),
+                            ],
+                          ),
+                        ),
 
                         // Positioned(
                         //   bottom: 4,

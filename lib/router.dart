@@ -1,18 +1,23 @@
 import 'dart:io';
 
+import 'package:chatsma_flutter/common/screens/search_screen.dart';
 import 'package:chatsma_flutter/common/widgets/error.dart';
-import 'package:chatsma_flutter/features/auth/screens/home_test.dart';
+import 'package:chatsma_flutter/features/auth/screens/signin_screens.dart';
 import 'package:chatsma_flutter/features/auth/screens/user_information_screen.dart';
 import 'package:chatsma_flutter/features/chat/screens/mobile_chat_screen.dart';
 import 'package:chatsma_flutter/features/group/screens/create_group_screen.dart';
+import 'package:chatsma_flutter/features/select_contacts/screens/select_contact_screen.dart';
 import 'package:chatsma_flutter/features/status/screens/confirm_status_screen.dart';
 import 'package:chatsma_flutter/features/status/screens/status_screen.dart';
-import 'package:chatsma_flutter/select_contacts/screens/select_contact_screen.dart';
 import 'package:flutter/material.dart';
 import 'features/auth/screens/login_screen.dart';
-import 'features/auth/screens/login_screen2.dart';
+import 'features/auth/screens/other_profile_screen.dart';
 import 'features/auth/screens/otp_screen.dart';
-import 'features/auth/screens/otp_screen2.dart';
+import 'features/auth/screens/profile_screen.dart';
+import 'features/auth/widgets/edit_profile_screen.dart';
+
+import 'features/group/widgets/add_member_page.dart';
+import 'models/group.dart';
 import 'models/status_model.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
@@ -22,18 +27,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (context) => const LoginScreen(),
       );
 
-    case LoginScreen2.routeName:
+    case SigninScreens.routeName:
       return MaterialPageRoute(
-        builder: (context) => const LoginScreen2(),
-      );
-
-    case OTPScreen2.routeName:
-      return MaterialPageRoute(
-        builder: (context) => const OTPScreen2(),
-      );
-    case HomeTest.routeName:
-      return MaterialPageRoute(
-        builder: (context) => const HomeTest(),
+        builder: (context) => const SigninScreens(),
       );
 
     case OTPScreen.routeName:
@@ -50,17 +46,41 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (context) => const UserInformationScreen(),
       );
 
+    case AddMemberPage.routeName:
+      return MaterialPageRoute(
+        builder: (context) => const AddMemberPage(),
+      );
+
+    case ProfileScreen.routeName:
+    // final  verificationId  = settings.arguments as String;
+      return MaterialPageRoute(
+        builder: (context) => const ProfileScreen(),
+      );
+
+    case EditProfileScreen.routeName:
+    // final  verificationId  = settings.arguments as String;
+      return MaterialPageRoute(
+        builder: (context) => const EditProfileScreen(),
+      );
+
     case SelectContactsScreen.routeName:
       return MaterialPageRoute(
         builder: (context) => const SelectContactsScreen(),
       );
 
+    case SearchScreen.routeName:
+      return MaterialPageRoute(
+        builder: (context) => const SearchScreen(),
+      );
+
     case MobileChatScreen.routeName:
-      final argruments = settings.arguments as  Map<String, dynamic>;
-      final name = argruments['name'];
-      final uid = argruments['uid'];
-      final isGroupChat = argruments['isGroupChat'];
-      final profilePicture = argruments['profilePicture'];
+      final arguments = settings.arguments as Map<String, dynamic>;
+      final name = arguments['name'];
+      final uid = arguments['uid'];
+      final isGroupChat = arguments['isGroupChat'];
+      final profilePicture = arguments['profilePicture'];
+      final groupId = arguments['groupId'];
+
 
       return MaterialPageRoute(
         builder: (context) => MobileChatScreen(
@@ -68,6 +88,28 @@ Route<dynamic> generateRoute(RouteSettings settings) {
           uid: uid,
           isGroupChat: isGroupChat,
           profilePicture: profilePicture,
+          groupId : groupId,
+
+        ),
+      );
+
+    case OtherProfileScreen.routeName:
+      final arguments = settings.arguments as Map<String, dynamic>;
+      final name = arguments['name'];
+      final uid = arguments['uid'];
+      final isGroupChat = arguments['isGroupChat'];
+      final profilePicture = arguments['profilePicture'];
+      final groupId = arguments['groupId'];
+
+
+      return MaterialPageRoute(
+        builder: (context) => OtherProfileScreen(
+          name: name,
+          uid: uid,
+          isGroupChat: isGroupChat,
+          profilePicture: profilePicture,
+          groupId : groupId,
+
         ),
       );
 

@@ -1,6 +1,9 @@
+import 'dart:ui';
+
 import 'package:chatsma_flutter/common/utils/utils.dart';
 import 'package:chatsma_flutter/common/widgets/custom_button.dart';
 import 'package:chatsma_flutter/features/auth/controller/auth_controller.dart';
+import 'package:chatsma_flutter/features/auth/screens/signin_screens.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,18 +22,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final phoneController = TextEditingController();
   TextEditingController countryCode = TextEditingController();
 
-
   Country? country;
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
     phoneController.dispose();
-
   }
+
+  @override
   void initState() {
     // TODO: implement initState
-    countryCode.text= ("+84");
+    countryCode.text = ("+84");
 
     super.initState();
   }
@@ -54,7 +57,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ref
           .read(authControllerProvider)
           .signInWithPhone(context, '+${country!.phoneCode}$phoneNumber');
-
     } else {
       showSnackBar(context: context, content: 'Fill out on the fields');
     }
@@ -66,16 +68,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Enter your phone number'),
         elevation: 0,
         backgroundColor: backgroundColor,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(
-                Icons.arrow_back_ios_new_rounded, color: Colors.black,
-              )),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, SigninScreens.routeName);
+            },
+            icon: const Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: Colors.black,
+            )),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -83,9 +85,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text('Verify your phone number'),
-              const SizedBox(height: 10),
-
+              /*  const Text('Signin',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),),*/
+              Image.asset(
+                'assets/images/sign-in.png',
+                width: 250,
+                height: 250,
+              ),
               TextButton(
                 onPressed: pickCountry,
                 child: const Text('Select Country'),
@@ -109,7 +118,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(width: 5),
                     const Text(
                       "|",
@@ -119,12 +127,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Expanded(
                       child: TextField(
                         keyboardType: TextInputType.phone,
-                        onChanged: (value){
-                        },
+                        onChanged: (value) {},
                         controller: phoneController,
                         decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "phone number"),),
+                            border: InputBorder.none, hintText: "phone number"),
+                      ),
                     ),
                   ],
                 ),

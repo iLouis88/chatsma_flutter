@@ -38,64 +38,20 @@ class StatusRepository {
     required BuildContext context,
   }) async {
     try {
-      var statusId = const Uuid().v1();
-      String uid = auth.currentUser!.uid;
-      String imageurl = await ref
+      final statusId = const Uuid().v1();
+      final uid = auth.currentUser!.uid;
+      final imageUrl = await ref
           .read(commonFirebaseStorageRepositoryProvider)
           .storeFileToFirebase(
             '/status/$statusId$uid',
             statusImage,
           );
-      List<Contact> contacts = [];
-      if (await FlutterContacts.requestPermission()) {
-        contacts = await FlutterContacts.getContacts(withProperties: true);
-      }
 
-      List<String> uidWhoCanSee = [];
+      final contacts = await getContacts();
+      final uidWhoCanSee = await getUidWhoCanSee(contacts);
+      final statusImageUrls = await getStatusImageUrls(imageUrl);
 
-      for (int i = 0; i < contacts.length; i++) {
-        var userDataFirebase = await firestore
-            .collection('users')
-            .where(
-              'phoneNumber',
-              isEqualTo: contacts[i].phones[0].number.replaceAll(
-                    ' ',
-                    '',
-                  ),
-            )
-            .get();
-
-        if (userDataFirebase.docs.isNotEmpty) {
-          var userData = UserModel.fromMap(userDataFirebase.docs[0].data());
-          uidWhoCanSee.add(userData.uid);
-        }
-      }
-//          .where('createdAt', isLessThan: DateTime.now().subtract(Duration(hours: 24)) )
-      List<String> statusImageUrls = [];
-      var statusesSnapshot = await firestore
-          .collection('status')
-          .where(
-            'uid',
-            isEqualTo: auth.currentUser!.uid,
-          )
-          .get();
-
-      if (statusesSnapshot.docs.isNotEmpty) {
-        Status status = Status.fromMap(statusesSnapshot.docs[0].data());
-        statusImageUrls = status.photoUrl;
-        statusImageUrls.add(imageurl);
-        await firestore
-            .collection('status')
-            .doc(statusesSnapshot.docs[0].id)
-            .update({
-          'photoUrl': statusImageUrls,
-        });
-        return;
-      } else {
-        statusImageUrls = [imageurl];
-      }
-
-      Status status = Status(
+      final status = Status(
         uid: uid,
         username: username,
         phoneNumber: phoneNumber,
@@ -105,10 +61,64 @@ class StatusRepository {
         statusId: statusId,
         whoCanSee: uidWhoCanSee,
       );
-      await firestore.collection('status').doc(statusId).set(status.toMap());
+
+      await saveStatusToFirestore(status);
     } catch (e) {
       showSnackBar(context: context, content: e.toString());
     }
+  }
+
+  Future<List<Contact>> getContacts() async {
+    if (await FlutterContacts.requestPermission()) {
+      return FlutterContacts.getContacts(withProperties: true);
+    }
+    return [];
+  }
+
+  Future<List<String>> getUidWhoCanSee(List<Contact> contacts) async {
+    final uidWhoCanSee = <String>[];
+
+    for (final contact in contacts) {
+      final phoneNumber = contact.phones[0].number.replaceAll(' ', '');
+
+      final userDataFirebase = await firestore
+          .collection('users')
+          .where('phoneNumber', isEqualTo: phoneNumber)
+          .get();
+
+      if (userDataFirebase.docs.isNotEmpty) {
+        final userData = UserModel.fromMap(userDataFirebase.docs.first.data());
+        uidWhoCanSee.add(userData.uid);
+      }
+    }
+
+    return uidWhoCanSee;
+  }
+
+  Future<List<String>> getStatusImageUrls(String imageUrl) async {
+    final statusImageUrls = <String>[];
+    final statusesSnapshot = await firestore
+        .collection('status')
+        .where('uid', isEqualTo: auth.currentUser!.uid)
+        .get();
+
+    if (statusesSnapshot.docs.isNotEmpty) {
+      final status = Status.fromMap(statusesSnapshot.docs.first.data());
+      statusImageUrls.addAll(status.photoUrl);
+      statusImageUrls.add(imageUrl);
+      await firestore
+          .collection('status')
+          .doc(statusesSnapshot.docs.first.id)
+          .update({'photoUrl': statusImageUrls});
+    } else {
+      statusImageUrls.add(imageUrl);
+    }
+
+    return statusImageUrls;
+  }
+
+  Future<void> saveStatusToFirestore(Status status) {
+    return firestore.collection('status').doc(status.statusId).set(status.toMap());
   }
 
   Future<List<Status>> getStatus(BuildContext context) async {

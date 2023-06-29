@@ -7,10 +7,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class ConfirmStatusScreen extends ConsumerWidget {
   static const String routeName = '/confirm-status-screen';
   final File file;
-
   const ConfirmStatusScreen({
     Key? key,
     required this.file,
+
   }) : super(key: key);
 
   void addStatus(WidgetRef ref, BuildContext context) {
@@ -20,19 +20,39 @@ class ConfirmStatusScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      body: Center(
-        child: AspectRatio(
-          aspectRatio: 9 / 16,
-          child: Image.file(file),
+    return SafeArea(
+      child: Scaffold(
+        body: Center(
+          child: AspectRatio(
+            aspectRatio: 9 / 16,
+            child: Stack(
+              children: [
+                Image.file(file),
+                Positioned(
+                  top: 5,
+                  left: 0,
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.arrow_circle_left_outlined,
+                      color: iconColor,
+                      size: 30,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => addStatus(ref, context),
-        backgroundColor: tabColor,
-        child: const Icon(
-          Icons.done,
-          color: Colors.white,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => addStatus(ref, context),
+          backgroundColor: tabColor,
+          child: const Icon(
+            Icons.done,
+            color: Colors.white,
+          ),
         ),
       ),
     );

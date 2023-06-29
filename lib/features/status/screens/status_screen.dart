@@ -25,6 +25,7 @@ class _StatusScreenState extends State<StatusScreen> {
     super.initState();
     initStoryPageItems();
   }
+
   void initStoryPageItems() {
     for (int i = 0; i < widget.status.photoUrl.length; i++) {
       storyItems.add(StoryItem.pageImage(
@@ -32,21 +33,39 @@ class _StatusScreenState extends State<StatusScreen> {
         controller: controller,
       ));
     }
-}
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: storyItems.isEmpty
-          ? const Loader()
-          : StoryView(
-        storyItems: storyItems,
-        controller: controller,
-        onVerticalSwipeComplete: (direction) {
-          if (direction == Direction.down) {
-            Navigator.pop(context);
-          }
-        },
+      body: Stack(
+        children: [
+          storyItems.isEmpty
+              ? const Loader()
+              : StoryView(
+                  storyItems: storyItems,
+                  controller: controller,
+                  onVerticalSwipeComplete: (direction) {
+                    if (direction == Direction.down) {
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
+          Positioned(
+            top: 45,
+            right: 5,
+            child: IconButton(
+              icon: const Icon(
+                Icons.close,
+                color: Colors.white,
+                size: 35,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

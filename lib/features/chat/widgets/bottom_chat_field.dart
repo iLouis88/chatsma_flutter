@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:chatsma_flutter/common/enums/message_enum.dart';
@@ -21,7 +22,8 @@ class BottomChatField extends ConsumerStatefulWidget {
     Key? key,
     required this.receiverUserId,
     required this.isGroupChat,
-  }) : super(key: key);
+  }) :
+        super(key: key);
 
   @override
   ConsumerState<BottomChatField> createState() => _BottomChatFieldState();
@@ -34,6 +36,8 @@ class _BottomChatFieldState extends ConsumerState<BottomChatField> {
   bool isRecorderInit = false;
   bool isRecording = false;
   final FocusNode myFocusNode = FocusNode();
+  int _recordSeconds = 0;
+  Timer? _timer;
 
   final TextEditingController _textController = TextEditingController();
 
@@ -45,6 +49,7 @@ class _BottomChatFieldState extends ConsumerState<BottomChatField> {
     openAudio();
   }
 
+  // Recorder audio
   void openAudio() async {
     final status = await Permission.microphone.request();
     if (status != PermissionStatus.granted) {
@@ -54,6 +59,21 @@ class _BottomChatFieldState extends ConsumerState<BottomChatField> {
     isRecorderInit = true;
   }
 
+  void startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _recordSeconds++;
+      });
+    });
+  }
+
+  // Recorder audio
+  void stopTimer() {
+    _timer?.cancel();
+    _recordSeconds = 0;
+  }
+
+  // Recorder audio & send message
   void sendTextMessage() async {
     if (isShowSendButton) {
       ref.read(chatControllerProvider).sendTextMessage(
@@ -61,6 +81,7 @@ class _BottomChatFieldState extends ConsumerState<BottomChatField> {
             _textController.text.trim(),
             widget.receiverUserId,
             widget.isGroupChat,
+
           );
       setState(() {
         _textController.text = '';
@@ -72,12 +93,14 @@ class _BottomChatFieldState extends ConsumerState<BottomChatField> {
         return;
       }
       if (isRecording) {
+        stopTimer();
         await _soundRecorder!.stopRecorder();
         sendFileMessage(File(path), MessageEnum.audio);
       } else {
         await _soundRecorder!.startRecorder(
           toFile: path,
         );
+        startTimer();
       }
       setState(() {
         isRecording = !isRecording;
@@ -146,69 +169,6 @@ class _BottomChatFieldState extends ConsumerState<BottomChatField> {
     }
   }
 
-  void _showAttachmentOptions(context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext bc) {
-        return SafeArea(
-          child: Wrap(
-            children: <Widget>[
-              ListTile(
-                  leading: const Icon(Icons.image_outlined),
-                  title: const Text('Photo gallery'),
-                  onTap: () {
-                    selectImage();
-                    Navigator.pop(context);
-                  }),
-              const Divider(
-                height: 5,
-              ),
-              ListTile(
-                leading: const Icon(Icons.video_camera_front_outlined),
-                title: const Text('Video gallery'),
-                onTap: () {
-                  selectVideo();
-                  Navigator.pop(context);
-                },
-              ),
-              const Divider(
-                height: 5,
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.gif_box_outlined),
-                title: const Text('Gif'),
-              onTap: selectGIF,
-              ),
-              const Divider(
-                height: 5,
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.attach_file_outlined),
-                title: const Text('Unk'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              const Divider(
-                height: 5,
-                thickness: 3,
-              ),
-              ListTile(
-                leading: const Icon(Icons.close_outlined),
-                title: const Text('Close'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
 // enter key from keyboard
   @override
   void dispose() {
@@ -216,8 +176,14 @@ class _BottomChatFieldState extends ConsumerState<BottomChatField> {
     super.dispose();
     _textController.dispose();
     myFocusNode.dispose();
-    _soundRecorder!.closeRecorder();
-    isRecorderInit = false;
+    /*_soundRecorder!.closeRecorder(); // recorder audio
+    isRecorderInit  = false; // recorder audio*/
+
+    if (isRecorderInit) {
+      _soundRecorder!.closeRecorder();
+    }
+    stopTimer(); // dừng Timer
+    super.dispose();
   }
 
   @override
@@ -317,7 +283,7 @@ class _BottomChatFieldState extends ConsumerState<BottomChatField> {
                         GestureDetector(
                           onTap: selectImage,
                           child: const Icon(
-                            Icons.camera_alt_outlined,
+                            Icons.image_rounded,
                             size: 25,
                           ),
                         ),
@@ -330,6 +296,9 @@ class _BottomChatFieldState extends ConsumerState<BottomChatField> {
                             children: [
                               Icon(isRecording ? Icons.close : Icons.mic,
                                   size: 25),
+                              if (isRecording)
+                                Text(
+                                    '${_recordSeconds ~/ 60}:${_recordSeconds % 60}'),
                             ],
                           ),
                         ),
@@ -358,4 +327,73 @@ class _BottomChatFieldState extends ConsumerState<BottomChatField> {
       ],
     );
   }
-}
+
+  void _showAttachmentOptions(context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      builder: (BuildContext bc) {
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                  leading: const Icon(Icons.image_outlined),
+                  title: const Text('Photo Library'),
+                  onTap: () {
+                    selectImage();
+                    Navigator.pop(context);
+                  }),
+              const Divider(
+                height: 5,
+              ),
+              ListTile(
+                leading: const Icon(Icons.video_camera_front_outlined),
+                title: const Text('Video Library'),
+                onTap: () {
+                  selectVideo();
+                  Navigator.pop(context);
+                },
+              ),
+              const Divider(
+                height: 5,
+              ),
+              ListTile(
+                leading: const Icon(Icons.gif_box_outlined),
+                title: const Text('Gif'),
+                onTap: selectGIF,
+              ),
+              const Divider(
+                height: 5,
+              ),
+              ListTile(
+                leading: const Icon(Icons.attach_file_outlined),
+                title: const Text('Unk'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+
+              const Divider(
+                height: 5,
+                thickness: 3,
+              ),
+              ListTile(
+                leading: const Icon(Icons.close_outlined),
+                title: const Text('Close'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+
+        );
+      },
+    );
+  }
+
+} //class

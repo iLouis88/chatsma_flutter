@@ -30,16 +30,13 @@ class _CreateGroupScreenState extends ConsumerState<CreateGroupScreen> {
   void createGroup() {
     if (groupNameController.text.trim().isNotEmpty && image != null) {
       ref.read(groupControllerProvider).createGroup(
-            context,
-            groupNameController.text.trim(),
-            image!,
-            ref.read(
-              selectedGroupContacts,
-            ),
-          );
-     ref.read(selectedGroupContacts.notifier).update((state) => []);
+        context,
+        groupNameController.text.trim(),
+        image!,
+        ref.read(selectedGroupContacts.notifier).state, // Thay đổi ở đây
+      );
+      ref.read(selectedGroupContacts.notifier).update((state) => []);
       Navigator.pop(context);
-
     }
   }
 

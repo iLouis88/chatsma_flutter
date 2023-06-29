@@ -3,6 +3,7 @@ import 'package:chatsma_flutter/common/providers/message_reply_provider.dart';
 import 'package:chatsma_flutter/common/widgets/loader.dart';
 import 'package:chatsma_flutter/features/chat/controller/chat_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chatsma_flutter/features/chat/widgets/my_message_card.dart';
 import 'package:chatsma_flutter/features/chat/widgets/sender_message_card.dart';
@@ -18,7 +19,7 @@ class ChatList extends ConsumerStatefulWidget {
     Key? key,
     required this.receiverUserId,
     required this.isGroupChat,
-  }) : super(key: key);
+  }) :  super(key: key);
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _ChatListState();
@@ -47,10 +48,56 @@ class _ChatListState extends ConsumerState<ChatList> {
           ),
         );
   }
+ /* void deleteGroupSenderMessages(receiverUserId, messageId) {
+    ref
+        .read(chatControllerProvider)
+        .deleteGroupSenderMessages(receiverUserId, messageId);
+  }*/
+
+  void deleteSenderMessages(receiverUserId, messageId) {
+    ref
+        .read(chatControllerProvider)
+        .deleteSenderMessages(receiverUserId, messageId);
+  }
+
+
+  //Menu Dialog
+  void _showMessageOptions(MessageModel message) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoActionSheet(
+          title: const Text('Message Options'),
+          actions: <Widget>[
+            CupertinoActionSheetAction(
+              child: const Text('Unsend for you', style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                deleteSenderMessages(widget.receiverUserId, message.messageId);
+                Navigator.pop(context);
+              },
+            ),
+            CupertinoActionSheetAction(
+              child: const Text('Unknown'),
+              onPressed: () {
+                Navigator.pop(context);
+                // Handle share message here
+              },
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<Message>>(
+    return StreamBuilder<List<MessageModel>>(
         stream: widget.isGroupChat
             ? ref
                 .read(chatControllerProvider)
@@ -76,7 +123,7 @@ class _ChatListState extends ConsumerState<ChatList> {
               var timeSent = DateFormat.Hm().format(messageData.timeSent);
 
               //isSeen
-              if (messageData.isSeen &&
+              if (!messageData.isSeen &&
                   messageData.receiverId ==
                       FirebaseAuth.instance.currentUser!.uid) {
                 ref.read(chatControllerProvider).setChatMessageSeen(
@@ -87,29 +134,43 @@ class _ChatListState extends ConsumerState<ChatList> {
               }
               if (messageData.senderId ==
                   FirebaseAuth.instance.currentUser!.uid) {
-                return MyMessageCard(
+                return GestureDetector(
+                  onLongPress: () {
+                    _showMessageOptions(messageData);
+                  },
+                  child: MyMessageCard(
+                    message: messageData.text,
+                    date: timeSent,
+                    type: messageData.type,
+                    repliedText: messageData.repliedMessage,
+                    username: messageData.repliedTo,
+                    repliedMessageType: messageData.repliedMessageType,
+                    onLeftSwipe: () => onMessageSwipe(
+                      messageData.text,
+                      true,
+                      messageData.type,
+                    ),
+                    isSeen: messageData.isSeen,
+                  ),
+                );
+              }
+              return GestureDetector(
+                onLongPress: () {
+                  _showMessageOptions(messageData);
+                },
+                child: SenderMessageCard(
                   message: messageData.text,
                   date: timeSent,
                   type: messageData.type,
-                  repliedText: messageData.repliedMessage,
                   username: messageData.repliedTo,
                   repliedMessageType: messageData.repliedMessageType,
-                  onLeftSwipe: () => onMessageSwipe(
+                  onRightSwipe: () => onMessageSwipe(
                     messageData.text,
-                    true,
+                    false,
                     messageData.type,
                   ),
-                  isSeen: messageData.isSeen,
-                );
-              }
-              return SenderMessageCard(
-                message: messageData.text,
-                date: timeSent,
-                username: messageData.repliedTo,
-                repliedMessageType: messageData.repliedMessageType,
-                onRightSwipe: () =>
-                    onMessageSwipe(messageData.text, false, messageData.type),
-                repliedText: messageData.repliedMessage,
+                  repliedText: messageData.repliedMessage,
+                ),
               );
             },
           );

@@ -1,4 +1,5 @@
 import 'package:chatsma_flutter/common/enums/message_enum.dart';
+import 'package:chatsma_flutter/features/chat/widgets/display_text_image_gif.dart';
 import 'package:flutter/material.dart';
 import 'package:chatsma_flutter/common/utils/colors.dart';
 import 'package:swipe_to/swipe_to.dart';
@@ -8,6 +9,7 @@ class SenderMessageCard extends StatelessWidget {
     Key? key,
     required this.message,
     required this.date,
+    required this.type,
     required this.onRightSwipe,
     required this.repliedText,
     required this.username,
@@ -17,6 +19,7 @@ class SenderMessageCard extends StatelessWidget {
   
   final String message;
   final String date;
+  final MessageEnum type;
   final VoidCallback onRightSwipe;
   final String repliedText;
   final String username;
@@ -24,6 +27,7 @@ class SenderMessageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isReplying = repliedText.isNotEmpty;
     return SwipeTo(
       onRightSwipe: onRightSwipe,
       child: Align(
@@ -45,23 +49,58 @@ class SenderMessageCard extends StatelessWidget {
                   child: Stack(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(
-                          // left: 10,
-                          // right: 30,
-                          // top: 5,
-                          // bottom: 20,
+                        padding: type == MessageEnum.text
+                            ? const EdgeInsets.only(
                           left: 10,
                           right: 10,
                           top: 10,
                           bottom: 10,
+                          // left: 10,
+                          // right: 30,
+                          // top: 5,
+                          // bottom: 20,
+                        )
+                            : const EdgeInsets.only(
+                          left: 5,
+                          right: 5,
+                          top: 5,
+                          bottom: 5,
                         ),
-                        child: Wrap(
+                        child: Column(
                           children: [
-                            Text(
-                              message,
-                              style: const TextStyle(
-                                fontSize: 16,
+                            if (isReplying) ...[
+                              Text(
+                                username,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
+                              const SizedBox(height: 3),
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                constraints: const BoxConstraints(
+                                  minWidth: 150,
+                                  minHeight: 50,
+                                  maxHeight: 50,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: backgroundColor.withOpacity(0.5),
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(
+                                      5,
+                                    ),
+                                  ),
+                                ),
+                                child: DisplayTextImageGIF(
+                                  message: repliedText,
+                                  type: repliedMessageType,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                            ],
+                            DisplayTextImageGIF(
+                              message: message,
+                              type: type,
                             ),
                           ],
                         ),

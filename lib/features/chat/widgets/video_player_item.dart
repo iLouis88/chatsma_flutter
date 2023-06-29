@@ -1,5 +1,6 @@
-import 'package:cached_video_player/cached_video_player.dart';
 import 'package:flutter/material.dart';
+import 'package:chewie/chewie.dart';
+import 'package:video_player/video_player.dart';
 
 class VideoPlayerItem extends StatefulWidget {
   final String videoUrl;
@@ -10,43 +11,62 @@ class VideoPlayerItem extends StatefulWidget {
 }
 
 class _VideoPlayerItemState extends State<VideoPlayerItem> {
-  late CachedVideoPlayerController videoPlayerController;
+  late VideoPlayerController videoPlayerController;
+  late ChewieController chewieController;
   bool isPlay = false;
-  double aspectRatioValue = 16 / 9;
+  bool initialized = false;
+  double aspectRatioValue = 1/1;
 
   void toggleAspectRatio() {
     setState(() {
-      aspectRatioValue = aspectRatioValue == 16/9 ? 9/16 : 16/9;
+      aspectRatioValue = aspectRatioValue == 1/1 ? 9/16 : 16/9 ;
     });
-  }  @override
-  void initState() {
-    super.initState();
-    videoPlayerController = CachedVideoPlayerController.network(widget.videoUrl)
-      ..initialize().then((value) {
-        videoPlayerController.setVolume(1);
-      });
   }
 
-@override
+  @override
+  void initState() {
+    super.initState();
+    videoPlayerController = VideoPlayerController.network(widget.videoUrl)
+      ..initialize().then((value) {
+        videoPlayerController.setVolume(1);
+        setState(() {
+          initialized = true;
+        });
+      });
+    chewieController = ChewieController(
+      videoPlayerController: videoPlayerController,
+      autoPlay: false,
+      looping: false,
+      allowFullScreen: true,
+      allowMuting: true,
+      showControlsOnInitialize: true,
+      showControls: true,
+      fullScreenByDefault: true,
+    );
+  }
+
+  @override
   void dispose() {
     super.dispose();
     videoPlayerController.dispose();
+    chewieController.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
+    return initialized ?
+      AspectRatio(
       aspectRatio: aspectRatioValue,
       child: Stack(
         children: [
-          CachedVideoPlayer(videoPlayerController),
+          Chewie(controller: chewieController),
           Align(
             alignment: Alignment.topRight,
             child: IconButton(
               onPressed: () => toggleAspectRatio(),
               icon: const Icon(Icons.change_circle),
-
-
             ),
+
           ),
           Align(
             alignment: Alignment.center,
@@ -62,15 +82,15 @@ class _VideoPlayerItemState extends State<VideoPlayerItem> {
                 });
               },
               icon: Icon(
-               isPlay ? Icons.pause_circle : Icons.play_circle,
+                isPlay ? Icons.pause_circle : Icons.play_circle,
               ),
               color: Colors.white24,
-
             ),
-
           ),
         ],
       ),
+    )  : const Center(
+      child: CircularProgressIndicator(),
     );
   }
 }

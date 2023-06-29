@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+
 class Group {
   final String senderId;
   final String name;
@@ -6,6 +8,7 @@ class Group {
   final String groupPicture;
   final List<String> membersUid;
   final DateTime timeSent;
+  List<String> notificationTokens;
 
   Group( {
     required this.senderId,
@@ -15,6 +18,7 @@ class Group {
     required this.groupPicture,
     required this.membersUid,
     required this.timeSent,
+    required this.notificationTokens,
   });
 
   Map<String, dynamic> toMap() {
@@ -26,7 +30,26 @@ class Group {
       'groupPicture': groupPicture,
       'membersUid': membersUid,
       'timeSent': timeSent.millisecondsSinceEpoch,
+      'notificationTokens': notificationTokens,
     };
+  }
+
+  factory Group.fromFirebaseUser(User user) {
+    final groupId = user.uid;
+    final senderId = user.uid;
+    final groupName = user.displayName ?? '';
+    final groupPicture = user.photoURL ?? '';
+
+    return Group(
+      senderId: senderId,
+      name: groupName,
+      groupId: groupId,
+      lastMessage: '',
+      groupPicture: groupPicture,
+      membersUid: [groupId],
+      timeSent: DateTime.now(),
+      notificationTokens: [],
+    );
   }
 
   factory Group.fromMap(Map<String, dynamic> map) {
@@ -38,7 +61,21 @@ class Group {
       groupPicture: map['groupPicture'] ?? '',
       membersUid: List<String>.from(map['membersUid']),
       timeSent: DateTime.fromMillisecondsSinceEpoch(map['timeSent']),
+      notificationTokens: List<String>.from(map['notificationTokens']),
     );
   }
 
+  factory Group.fromJson(Map<String, dynamic> json) {
+    return Group(
+      senderId: json["senderId"],
+      name: json["name"],
+      groupId: json["groupId"],
+      lastMessage: json["lastMessage"],
+      groupPicture: json["groupPicture"],
+      membersUid: List<String>.from(json["membersUid"].map((x) => x)),
+      timeSent: DateTime.parse(json["timeSent"]),
+      notificationTokens:List<String>.from(json["notificationTokens"].map((x) => x)),
+    );
+  }
+//
 }
