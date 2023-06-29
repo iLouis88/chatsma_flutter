@@ -28,7 +28,7 @@ Set firebase and run
 - get Firebase
 
 ## Best wish
-Happy a nice day 👍
+Happy a nice day 👍 
 
 
 ## Demo
