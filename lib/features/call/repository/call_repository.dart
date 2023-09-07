@@ -1,6 +1,6 @@
 import 'package:chatsma_flutter/common/utils/utils.dart';
 import 'package:chatsma_flutter/features/call/screens/call_screen.dart';
-import 'package:chatsma_flutter/features/call/screens/video_call_screen.dart';
+/*import 'package:chatsma_flutter/features/call/screens/video_call_screen.dart';*/
 import 'package:chatsma_flutter/models/call.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -60,7 +60,7 @@ class CallRepository {
   }
 
   // Call video
-  void makeVideoCall(
+ /* void makeVideoCall(
       Call senderCallData,
       BuildContext context,
       Call receiverCallData,
@@ -90,7 +90,7 @@ class CallRepository {
     } catch (e) {
       showSnackBar(context: context, content: e.toString());
     }
-  }
+  }*/
 
   // Call group audio
   void makeGroupCall(
@@ -134,7 +134,7 @@ class CallRepository {
   }
 
   // Call group video
- void makeGroupVideoCall(
+/* void makeGroupVideoCall(
       Call senderCallData,
       BuildContext context,
       Call receiverCallData,
@@ -172,7 +172,7 @@ class CallRepository {
     } catch (e) {
       showSnackBar(context: context, content: e.toString());
     }
-  }
+  }*/
 
   void endCall(
     String callerId,

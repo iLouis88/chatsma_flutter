@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:chatsma_flutter/common/repositories/common_firebase_storage_repository.dart';
 import 'package:chatsma_flutter/features/auth/screens/login_screen.dart';
 import 'package:chatsma_flutter/features/auth/screens/otp_screen.dart';
-import 'package:chatsma_flutter/features/auth/screens/signin_screens.dart';
+/*import 'package:chatsma_flutter/features/auth/screens/signin_screens.dart';*/
 import 'package:chatsma_flutter/features/auth/screens/user_information_screen.dart';
 import 'package:chatsma_flutter/features/landing/screens/landing_screen.dart';
 import 'package:chatsma_flutter/models/user_model.dart';
@@ -255,9 +255,13 @@ class AuthRepository {
       //await googleSignIn.disconnect();
       final nav = Navigator.of(context);
       nav.pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => SigninScreens()),
+        MaterialPageRoute(builder: (context) => LoginScreen()),
             (route) => false,
       );
+     /* nav.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => SigninScreens()),
+            (route) => false,
+      );*/
     } catch (e) {
       showSnackBar(
         context: context,

@@ -1,7 +1,7 @@
 import 'package:chatsma_flutter/common/utils/utils.dart';
 import 'package:chatsma_flutter/features/auth/controller/auth_controller.dart';
 import 'package:chatsma_flutter/features/call/controller/call_controller.dart';
-import 'package:chatsma_flutter/features/call/screens/video_call_screen.dart';
+/*import 'package:chatsma_flutter/features/call/screens/video_call_screen.dart';*/
 import 'package:chatsma_flutter/models/call.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -127,19 +127,28 @@ class _CallPickupScreenState extends ConsumerState<CallPickupScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => isVideoCall
-                                          ? CallScreen(
+                                      builder: (context) =>
+                                           CallScreen(
                                               channelId: call.callId,
                                               call: call,
                                               isGroupChat: false,
                                               isVideoCall: false,
                                             )
+                                          ),
+                                 /* MaterialPageRoute(
+                                      builder: (context) => isVideoCall
+                                          ? CallScreen(
+                                        channelId: call.callId,
+                                        call: call,
+                                        isGroupChat: false,
+                                        isVideoCall: false,
+                                      )
                                           : VideoCallScreen(
-                                              channelId: call.callId,
-                                              call: call,
-                                              isGroupChat: false,
-                                              isVideoCall: true,
-                                            )),
+                                        channelId: call.callId,
+                                        call: call,
+                                        isGroupChat: false,
+                                        isVideoCall: true,
+                                      )),*/
                                 );
                               },
                               child: const CircleAvatar(

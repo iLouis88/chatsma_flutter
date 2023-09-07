@@ -93,11 +93,11 @@ class CallController {
         hasDialled: false,
       );
 
-      if(isGroupChat) {
+    /*  if(isGroupChat) {
         callRepository.makeGroupVideoCall(senderCallData, context, receiverCallData);
       } else {
         callRepository.makeVideoCall(senderCallData, context, receiverCallData);
-      }
+      }*/
     });
   }
 

@@ -17,7 +17,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'common/screens/search_screen.dart';
 import 'features/auth/screens/profile_screen.dart';
 import 'features/call/screens/call_pickup_screen.dart';
-import 'features/group/widgets/add_member_page.dart';
+/*import 'features/group/widgets/add_member_page.dart';*/
 
 class MobileLayoutScreen extends ConsumerStatefulWidget {
   const MobileLayoutScreen({Key? key}) : super(key: key);
@@ -193,7 +193,7 @@ class _TabBarViewState extends ConsumerState<_TabBarView> {
                   },
                 ),
 
-                ListTile(
+              /*  ListTile(
                   title: const Text('Add member to group'),
                   leading: const Icon(Icons.group_add_sharp),
                   onTap: () {
@@ -201,7 +201,7 @@ class _TabBarViewState extends ConsumerState<_TabBarView> {
                         context, AddMemberPage.routeName));
                     Navigator.pop(context);
                   },
-                ),
+                ),*/
 
                 const Divider(),
                 ListTile(

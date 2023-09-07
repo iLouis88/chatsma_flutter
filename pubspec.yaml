@@ -41,12 +41,12 @@ dependencies:
   country_picker: ^2.0.19
   flutter_riverpod: ^2.3.0
   pinput: ^2.2.31
-  fl_country_code_picker: ^0.1.2
+  fl_country_code_picker: ^0.0.4
   image_picker: ^0.8.6+4
   flutter_contacts: ^1.1.6
   uuid: ^3.0.7
   path_provider: ^2.0.14
-  intl: ^0.17.0
+  intl: ^0.18.1
   cached_network_image: ^3.2.3
   video_player: ^2.6.0
   cached_video_player: ^2.0.4

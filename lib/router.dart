@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:chatsma_flutter/common/screens/search_screen.dart';
 import 'package:chatsma_flutter/common/widgets/error.dart';
-import 'package:chatsma_flutter/features/auth/screens/signin_screens.dart';
+/*import 'package:chatsma_flutter/features/auth/screens/signin_screens.dart';*/
 import 'package:chatsma_flutter/features/auth/screens/user_information_screen.dart';
 import 'package:chatsma_flutter/features/chat/screens/mobile_chat_screen.dart';
 import 'package:chatsma_flutter/features/group/screens/create_group_screen.dart';
@@ -16,7 +16,7 @@ import 'features/auth/screens/otp_screen.dart';
 import 'features/auth/screens/profile_screen.dart';
 import 'features/auth/widgets/edit_profile_screen.dart';
 
-import 'features/group/widgets/add_member_page.dart';
+/*import 'features/group/widgets/add_member_page.dart';*/
 import 'models/group.dart';
 import 'models/status_model.dart';
 
@@ -27,10 +27,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (context) => const LoginScreen(),
       );
 
-    case SigninScreens.routeName:
+  /*  case SigninScreens.routeName:
       return MaterialPageRoute(
         builder: (context) => const SigninScreens(),
-      );
+      );*/
 
     case OTPScreen.routeName:
       final verificationId = settings.arguments as String;
@@ -45,11 +45,11 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (context) => const UserInformationScreen(),
       );
-
+/*
     case AddMemberPage.routeName:
       return MaterialPageRoute(
         builder: (context) => const AddMemberPage(),
-      );
+      );*/
 
     case ProfileScreen.routeName:
     // final  verificationId  = settings.arguments as String;

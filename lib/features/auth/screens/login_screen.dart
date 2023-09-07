@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:chatsma_flutter/common/utils/utils.dart';
 import 'package:chatsma_flutter/common/widgets/custom_button.dart';
 import 'package:chatsma_flutter/features/auth/controller/auth_controller.dart';
-import 'package:chatsma_flutter/features/auth/screens/signin_screens.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -72,7 +71,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         backgroundColor: backgroundColor,
         leading: IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, SigninScreens.routeName);
+              //Navigator.pushNamed(context, SigninScreens.routeName);
             },
             icon: const Icon(
               Icons.arrow_back_ios_new_rounded,

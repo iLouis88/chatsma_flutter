@@ -1,6 +1,5 @@
 import 'package:chatsma_flutter/common/widgets/custom_button.dart';
 import 'package:chatsma_flutter/features/auth/screens/login_screen.dart';
-import 'package:chatsma_flutter/features/auth/screens/signin_screens.dart';
 import 'package:flutter/material.dart';
 import '../../../common/utils/colors.dart';
 
@@ -8,7 +7,7 @@ class LandingScreen extends StatelessWidget {
   const LandingScreen({Key? key}) : super(key: key);
 
   void navigateToSignInScreen(BuildContext context) {
-    Navigator.pushNamed(context, SigninScreens.routeName);
+    Navigator.pushNamed(context, LoginScreen.routeName);
   }
 
   @override
